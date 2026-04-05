@@ -1,1 +1,7 @@
 /.idea
+.env
+/api/__pycache__
+api/__pycache__/api.cpython-312.pyc
+/data/__pycache__
+/api/__pycache__
+api/__pycache__/api.cpython-312.pyc
