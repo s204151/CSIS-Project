@@ -77,6 +77,3 @@ def list_events(skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
 
 # Expose public API
 __all__ = ["get_conn", "add_event", "get_event", "list_events"]
-
-
-print(get_event(1))
