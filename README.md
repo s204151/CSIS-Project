@@ -18,7 +18,7 @@ The system simulates a simplified security monitoring pipeline:
 
 ---
 
-## 🏗Architecture
+## Architecture
 
 The system is designed using an event-driven approach to decouple ingestion from processing.
 
