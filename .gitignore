@@ -9,3 +9,7 @@ api/__pycache__/api.cpython-312.pyc
 /enums/__pycache__
 Screenshot 2026-04-06 222208.png
 Screenshot 2026-04-06 222245.png
+*.pyc
+*.pyc
+/api/__pycache__
+api/__pycache__/api.cpython-312.pyc
