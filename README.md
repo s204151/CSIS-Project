@@ -30,7 +30,7 @@ This separation allows the system to scale and keeps responsibilities isolated.
 
 ---
 
-## ⚙Technologies
+## Technologies
 
 FastAPI, Pydantic, SQLAlchemy, PostgreSQL, Docker, pytest, GitHub Actions
 
