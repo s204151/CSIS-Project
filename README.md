@@ -1,4 +1,4 @@
-# 🔐 Security Event Monitoring System
+# Security Event Monitoring System
 
 A lightweight backend system for ingesting and analyzing security events using an event-driven architecture.
 
@@ -6,7 +6,7 @@ Built in 2 weeks as part of my preparation for a backend software engineering ro
 
 ---
 
-## 🚀 Overview
+## Overview
 
 The system simulates a simplified security monitoring pipeline:
 
@@ -18,7 +18,7 @@ The system simulates a simplified security monitoring pipeline:
 
 ---
 
-## 🏗️ Architecture
+## 🏗Architecture
 
 The system is designed using an event-driven approach to decouple ingestion from processing.
 
@@ -30,20 +30,20 @@ This separation allows the system to scale and keeps responsibilities isolated.
 
 ---
 
-## ⚙️ Technologies
+## ⚙Technologies
 
 FastAPI, Pydantic, SQLAlchemy, PostgreSQL, Docker, pytest, GitHub Actions
 
 ---
 
-## ✨ Example Detection Logic
+## Example Detection Logic
 
 - Multiple `login_failure` events from the same IP → triggers brute-force alert  
 - `login_success` following repeated failures → flagged as suspicious  
 
 ---
 
-## 📡 API
+## API
 
 ### Events
 - `POST /events`
@@ -56,7 +56,7 @@ FastAPI, Pydantic, SQLAlchemy, PostgreSQL, Docker, pytest, GitHub Actions
 
 ---
 
-## 🐳 Run
+## Run
 
 ```bash
 docker-compose up --build
