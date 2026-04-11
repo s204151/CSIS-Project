@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from typing import List
 from http import HTTPStatus
-from data.CSIS_db_connector import add_event as db_create_event, get_event as db_get_event, list_events as db_list_events
-from api.models import EventSchema, EventIdSchema
+from data.CSIS_db_connector import add_event as db_create_event, get_event as db_get_event, list_events as db_list_events, get_alert as db_get_alert, list_alerts as db_list_alerts
+from api.models import EventSchema, EventIdSchema, AlertSchema
 
 
 app = FastAPI()
@@ -66,5 +66,40 @@ def list_events(skip: int = 0, limit: int = 100):
 
     try:
         return [EventIdSchema(**r) for r in rows]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Response mapping error: {e}")
+
+
+# New: Alerts endpoints
+@app.get("/alerts/{alert_id}", response_model=AlertSchema)
+def get_alert(alert_id: int):
+    """Get alert by id from Postgres."""
+    try:
+        row = db_get_alert(alert_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"DB error: {e}")
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Alert not found")
+
+    try:
+        return AlertSchema(**row)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Response mapping error: {e}")
+
+
+@app.get("/alerts", response_model=List[AlertSchema])
+def list_alerts(skip: int = 0, limit: int = 100):
+    """List alerts with optional pagination via skip & limit."""
+    if skip < 0 or limit <= 0:
+        raise HTTPException(status_code=400, detail="skip must be >= 0 and limit must be > 0")
+
+    try:
+        rows = db_list_alerts(skip=skip, limit=limit)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"DB error: {e}")
+
+    try:
+        return [AlertSchema(**r) for r in rows]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Response mapping error: {e}")

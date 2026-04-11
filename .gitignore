@@ -13,3 +13,4 @@ Screenshot 2026-04-06 222245.png
 *.pyc
 /api/__pycache__
 api/__pycache__/api.cpython-312.pyc
+data/create table.py

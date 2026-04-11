@@ -1,9 +1,10 @@
 import os
+import logging
 from dotenv import load_dotenv
 from typing import Optional, Dict, Any, List
 from sqlalchemy import create_engine, Engine, select
 from sqlalchemy.orm import Session
-from data.Models import Event
+from data.Models import Event, Alert, Base
 from enums.enums import UserEnum, EventTypeEnum
 
 load_dotenv()
@@ -12,12 +13,17 @@ DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
-if not DB_NAME or not DB_USER or not DB_PASSWORD:
-    raise RuntimeError("Missing required DB env vars: DB_NAME, DB_USER, DB_PASSWORD")
+# Do not raise at import time if env vars are missing. get_engine will raise when an actual DB
+# operation is attempted. This makes importing the module safe in test environments.
 
 
 def get_engine() -> Engine:
-    """Return the SQLAlchemy engine instance."""
+    """Return the SQLAlchemy engine instance.
+
+    Raises RuntimeError if DB environment variables are not set.
+    """
+    if not DB_NAME or not DB_USER or not DB_PASSWORD:
+        raise RuntimeError("Missing required DB env vars: DB_NAME, DB_USER, DB_PASSWORD")
     return create_engine(f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@localhost/{DB_NAME}", echo=True)
 
 
@@ -84,5 +90,44 @@ def list_events(skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
         return result
 
 
+def get_alert(alert_id: int) -> Optional[Dict[str, Any]]:
+    """Fetch a single alert by id and return it as a dict. Returns None if not found."""
+
+    with Session(get_engine()) as session:
+        alt = session.get(Alert, alert_id)
+        if alt is None:
+            return None
+        return {
+            "id": alt.id,
+            "alert_type": alt.alert_type,
+            "severity": alt.severity,
+            "ip_address": alt.ip_address,
+            "created_at": alt.created_at,
+        }
+
+
+def list_alerts(skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
+    """Return a list of alerts with offset/limit pagination as a list of dicts.
+
+    If skip < 0 or limit <= 0, returns an empty list.
+    """
+    if skip < 0 or limit <= 0:
+        return []
+
+    with Session(get_engine()) as session:
+        stmt = select(Alert).order_by(Alert.id).offset(skip).limit(limit)
+        rows = session.execute(stmt).scalars().all()
+        result: List[Dict[str, Any]] = []
+        for alt in rows:
+            result.append({
+                "id": alt.id,
+                "alert_type": alt.alert_type,
+                "severity": alt.severity,
+                "ip_address": alt.ip_address,
+                "created_at": alt.created_at,
+            })
+        return result
+
+
 # Expose public API
-__all__ = ["add_event", "get_event", "list_events"]
+__all__ = ["add_event", "get_event", "list_events", "get_alert", "list_alerts"]

@@ -129,3 +129,68 @@ def test_list_events_db_exception(monkeypatch):
     r = client.get("/events")
     assert r.status_code == 500
     assert "DB error" in r.json().get("detail", "")
+
+
+def test_get_alert_success(monkeypatch):
+    def fake_get(alert_id):
+        return {"id": alert_id, "alert_type": "login_failed", "severity": "high", "ip_address": "10.0.0.5", "created_at": "2026-04-11T00:00:00"}
+
+    monkeypatch.setattr("api.api.db_get_alert", fake_get)
+
+    r = client.get("/alerts/7")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["id"] == 7
+
+
+def test_get_alert_not_found(monkeypatch):
+    def fake_get(alert_id):
+        return None
+
+    monkeypatch.setattr("api.api.db_get_alert", fake_get)
+
+    r = client.get("/alerts/9999")
+    assert r.status_code == 404
+
+
+def test_get_alert_db_exception(monkeypatch):
+    def raising(alert_id):
+        raise Exception("boom")
+
+    monkeypatch.setattr("api.api.db_get_alert", raising)
+
+    r = client.get("/alerts/3")
+    assert r.status_code == 500
+    assert "DB error" in r.json().get("detail", "")
+
+
+def test_list_alerts_success(monkeypatch):
+    def fake_list(skip, limit):
+        return [
+            {"id": 1, "alert_type": "login_failed", "severity": "mid", "ip_address": "127.0.0.1", "created_at": "2026-04-11T00:00:00"},
+            {"id": 2, "alert_type": "login_success", "severity": "low", "ip_address": "10.0.0.2", "created_at": "2026-04-11T01:00:00"},
+        ]
+
+    monkeypatch.setattr("api.api.db_list_alerts", fake_list)
+
+    r = client.get("/alerts")
+    assert r.status_code == 200
+    body = r.json()
+    assert isinstance(body, list)
+    assert len(body) == 2
+
+
+def test_list_alerts_bad_params():
+    r = client.get("/alerts?skip=-1&limit=0")
+    assert r.status_code == 400
+
+
+def test_list_alerts_db_exception(monkeypatch):
+    def raising(skip, limit):
+        raise Exception("err")
+
+    monkeypatch.setattr("api.api.db_list_alerts", raising)
+
+    r = client.get("/alerts")
+    assert r.status_code == 500
+    assert "DB error" in r.json().get("detail", "")
