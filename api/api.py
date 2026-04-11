@@ -36,7 +36,12 @@ def create_event(event_in: EventSchema):
 
     try:
         result = EventIdSchema(**created)
-        enqueue(result.id)
+        # enqueue detection job but don't let worker failures break the API response
+        try:
+            enqueue(result.id)
+        except Exception:
+            # log could be added here; swallow to keep API stable
+            pass
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Response mapping error: {e}")

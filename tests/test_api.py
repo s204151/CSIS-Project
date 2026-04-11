@@ -70,7 +70,11 @@ def test_create_event_validation_error():
 
 def test_get_event_success(monkeypatch):
     def fake_get(event_id):
-        return {"id": event_id, "event_type": "login_success", "user_type": "member", "ip_address": "127.0.0.1", "datetime": "2026-04-11T00:00:00"}
+        return {"id": event_id,
+                "event_type": "login_success",
+                "user_type": "member",
+                "ip_address": "127.0.0.1",
+                "datetime": "2026-04-11T00:00:00"}
 
     monkeypatch.setattr("api.api.db_get_event", fake_get)
 
