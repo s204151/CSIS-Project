@@ -133,7 +133,7 @@ def test_list_events_db_exception(monkeypatch):
 
 def test_get_alert_success(monkeypatch):
     def fake_get(alert_id):
-        return {"id": alert_id, "alert_type": "login_failed", "severity": "high", "ip_address": "10.0.0.5", "created_at": "2026-04-11T00:00:00", "event_id": 1}
+        return {"id": alert_id, "alert_type": "brute_force_detected", "severity": "high", "ip_address": "10.0.0.5", "created_at": "2026-04-11T00:00:00", "event_id": 1}
 
     monkeypatch.setattr("api.api.db_get_alert", fake_get)
 
