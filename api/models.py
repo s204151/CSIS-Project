@@ -3,7 +3,7 @@ from ipaddress import IPv4Address
 
 from sqlalchemy import create_engine
 
-from enums.enums import UserEnum, EventTypeEnum, SeverityEnum
+from enums.enums import UserEnum, EventTypeEnum, SeverityEnum, AlertTypeEnum
 from datetime import datetime
 
 
@@ -20,6 +20,7 @@ class EventIdSchema(EventSchema):
 class AlertSchema(BaseModel):
     id: int
     created_at: datetime
-    alert_type: EventTypeEnum
+    alert_type: AlertTypeEnum
     severity: SeverityEnum
     ip_address: IPv4Address
+    event_id: int

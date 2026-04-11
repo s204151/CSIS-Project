@@ -133,7 +133,7 @@ def test_list_events_db_exception(monkeypatch):
 
 def test_get_alert_success(monkeypatch):
     def fake_get(alert_id):
-        return {"id": alert_id, "alert_type": "login_failed", "severity": "high", "ip_address": "10.0.0.5", "created_at": "2026-04-11T00:00:00"}
+        return {"id": alert_id, "alert_type": "login_failed", "severity": "high", "ip_address": "10.0.0.5", "created_at": "2026-04-11T00:00:00", "event_id": 1}
 
     monkeypatch.setattr("api.api.db_get_alert", fake_get)
 
@@ -167,8 +167,8 @@ def test_get_alert_db_exception(monkeypatch):
 def test_list_alerts_success(monkeypatch):
     def fake_list(skip, limit):
         return [
-            {"id": 1, "alert_type": "login_failed", "severity": "mid", "ip_address": "127.0.0.1", "created_at": "2026-04-11T00:00:00"},
-            {"id": 2, "alert_type": "login_success", "severity": "low", "ip_address": "10.0.0.2", "created_at": "2026-04-11T01:00:00"},
+            {"id": 1, "alert_type": "brute_force_detected", "severity": "mid", "ip_address": "127.0.0.1", "created_at": "2026-04-11T00:00:00", "event_id": 1},
+            {"id": 2, "alert_type": "suspicious", "severity": "low", "ip_address": "10.0.0.2", "created_at": "2026-04-11T01:00:00", "event_id": 1},
         ]
 
     monkeypatch.setattr("api.api.db_list_alerts", fake_list)

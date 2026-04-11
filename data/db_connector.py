@@ -100,6 +100,7 @@ def get_alert(alert_id: int) -> Optional[Dict[str, Any]]:
             "severity": alt.severity,
             "ip_address": alt.ip_address,
             "created_at": alt.created_at,
+            "event_id": alt.event_id,
         }
 
 
@@ -122,6 +123,7 @@ def list_alerts(skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
                 "severity": alt.severity,
                 "ip_address": alt.ip_address,
                 "created_at": alt.created_at,
+                "event_id": alt.event_id,
             })
         return result
 
