@@ -24,8 +24,8 @@ def test_root_health_check():
 
 
 def test_create_event_success(monkeypatch):
-    def fake_db_create_event(event_type, user_type, ip_address):
-        return {"id": 1, "event_type": event_type, "user_type": user_type, "ip_address": ip_address, "datetime": "2026-04-11T00:00:00"}
+    def fake_db_create_event(event_type, user_type, ip_address, datetime):
+        return {"id": 1, "event_type": event_type, "user_type": user_type, "ip_address": ip_address, "datetime": datetime}
 
     monkeypatch.setattr("api.api.db_create_event", fake_db_create_event)
 
@@ -36,6 +36,7 @@ def test_create_event_success(monkeypatch):
     assert body["event_type"] == VALID_PAYLOAD["event_type"]
     assert body["user_type"] == VALID_PAYLOAD["user_type"]
     assert body["ip_address"] == VALID_PAYLOAD["ip_address"]
+    assert body["datetime"] == VALID_PAYLOAD["datetime"]
 
 
 def test_create_event_db_exception(monkeypatch):
@@ -50,7 +51,7 @@ def test_create_event_db_exception(monkeypatch):
 
 
 def test_create_event_failed_create(monkeypatch):
-    def returns_false(event_type, user_type, ip_address):
+    def returns_false(event_type, user_type, ip_address, datetime):
         return None
 
     monkeypatch.setattr("api.api.db_create_event", returns_false)

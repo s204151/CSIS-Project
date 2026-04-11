@@ -24,7 +24,7 @@ def get_engine() -> Engine:
     return create_engine(f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@localhost/{DB_NAME}", echo=True)
 
 
-def add_event(event_type: EventTypeEnum, user_type: UserEnum, ip_address) -> Optional[Dict[str, Any]]:
+def add_event(event_type: EventTypeEnum, user_type: UserEnum, ip_address, datetime: datetime) -> Optional[Dict[str, Any]]:
     """Insert an event into the `events` table using SQLAlchemy ORM and return the created row as a dict.
 
     Parameters
@@ -38,7 +38,7 @@ def add_event(event_type: EventTypeEnum, user_type: UserEnum, ip_address) -> Opt
     engine = get_engine()
 
     with Session(engine) as session:
-        evt = Event(event_type=event_type, user_type=user_type, ip_address=ip_address)
+        evt = Event(event_type=event_type, user_type=user_type, ip_address=ip_address, datetime=datetime)
         session.add(evt)
         session.commit()
 
@@ -47,6 +47,7 @@ def add_event(event_type: EventTypeEnum, user_type: UserEnum, ip_address) -> Opt
             "event_type": evt.event_type,
             "user_type": evt.user_type,
             "ip_address": evt.ip_address,
+            "datetime": evt.datetime
         }
 
 

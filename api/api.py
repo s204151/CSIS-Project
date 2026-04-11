@@ -23,7 +23,10 @@ def root():
 def create_event(event_in: EventSchema):
     """Create a new event and persist to Postgres."""
     try:
-        created = db_create_event(event_type=event_in.event_type, user_type=event_in.user_type, ip_address=str(event_in.ip_address))
+        created = db_create_event(event_type=event_in.event_type,
+                                  user_type=event_in.user_type,
+                                  ip_address=str(event_in.ip_address),
+                                  datetime=event_in.datetime)
     except Exception as e:
         # hide raw DB details but return a helpful error
         raise HTTPException(status_code=500, detail=f"DB error: {e}")

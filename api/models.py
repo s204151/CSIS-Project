@@ -1,8 +1,5 @@
 from pydantic import BaseModel
 from ipaddress import IPv4Address
-
-from sqlalchemy import create_engine
-
 from enums.enums import UserEnum, EventTypeEnum, SeverityEnum, AlertTypeEnum
 from datetime import datetime
 
