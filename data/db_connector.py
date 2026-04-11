@@ -1,19 +1,17 @@
 import os
 from dotenv import load_dotenv
 from typing import Optional, Dict, Any, List
-from sqlalchemy import create_engine, Engine, select
+from sqlalchemy import create_engine, Engine, select, text
 from sqlalchemy.orm import Session
 from data.Models import Event, Alert
-from enums.enums import UserEnum, EventTypeEnum
+from enums.enums import UserEnum, EventTypeEnum, AlertTypeEnum, SeverityEnum
+from datetime import datetime, timedelta
 
 load_dotenv()
 
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-
-# Do not raise at import time if env vars are missing. get_engine will raise when an actual DB
-# operation is attempted. This makes importing the module safe in test environments.
 
 
 def get_engine() -> Engine:
@@ -128,5 +126,68 @@ def list_alerts(skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
         return result
 
 
+def get_recent_events(last_minutes: int, limit: int = 100, ip_address: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Return up to `limit` events created within the last `last_minutes` minutes.
+
+    - last_minutes must be > 0
+    - limit must be > 0
+    - ip_address: optional filter to only return events from this IP
+
+    Uses SQLAlchemy to query the `events` table based on the Event.datetime column and
+    returns a list of dicts in descending datetime order (newest first).
+    """
+    if last_minutes <= 0 or limit <= 0:
+        return []
+
+    # use current time (naive) to match how datetimes are stored by the models
+    cutoff = datetime.now() - timedelta(minutes=last_minutes)
+
+    with Session(get_engine()) as session:
+        # base condition: recent events
+        stmt = select(Event).where(Event.datetime >= cutoff)
+
+        # optional IP filter (use text() with a bound parameter to keep the query simple and avoid
+        # static-analysis type warnings)
+        if ip_address:
+            stmt = stmt.where(text("ip_address = :ip")).params(ip=ip_address)
+
+        # newest first, limit
+        stmt = stmt.order_by(Event.datetime.desc()).limit(limit)
+
+        rows = session.execute(stmt).scalars().all()
+        result: List[Dict[str, Any]] = []
+        for evt in rows:
+            result.append({
+                "id": evt.id,
+                "event_type": evt.event_type,
+                "user_type": evt.user_type,
+                "ip_address": evt.ip_address,
+                "datetime": getattr(evt, "datetime", None),
+            })
+        return result
+
+
+def create_alert(alert_type: AlertTypeEnum, severity: SeverityEnum, ip_address: str, event_id: int) -> Optional[Dict[str, Any]]:
+    engine = get_engine()
+
+    with Session(engine) as session:
+        alt = Alert(alert_type=alert_type,
+                    severity=severity,
+                    ip_address=ip_address,
+                    created_at=datetime.now(),
+                    event_id=event_id)
+        session.add(alt)
+        session.commit()
+
+        return {
+            "id": alt.id,
+            "alert_type": alt.alert_type,
+            "severity": alt.severity,
+            "ip_address": alt.ip_address,
+            "created_at": alt.created_at,
+            "event_id": alt.event_id,
+        }
+
+
 # Expose public API
-__all__ = ["add_event", "get_event", "list_events", "get_alert", "list_alerts"]
+__all__ = ["add_event", "get_event", "list_events", "get_alert", "list_alerts", "create_alert", "get_recent_events"]

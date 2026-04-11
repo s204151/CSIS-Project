@@ -3,6 +3,7 @@ from typing import List
 from http import HTTPStatus
 from data.db_connector import add_event as db_create_event, get_event as db_get_event, list_events as db_list_events, get_alert as db_get_alert, list_alerts as db_list_alerts
 from api.models import EventSchema, EventIdSchema, AlertSchema
+from src.detection_jobs import enqueue
 
 
 app = FastAPI()
@@ -32,6 +33,7 @@ def create_event(event_in: EventSchema):
 
     try:
         result = EventIdSchema(**created)
+        enqueue(result.id)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Response mapping error: {e}")
