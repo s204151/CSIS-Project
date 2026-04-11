@@ -11,6 +11,7 @@ class EventSchema(BaseModel):
     event_type: EventTypeEnum
     user_type: UserEnum
     ip_address: IPv4Address
+    datetime: datetime
 
 
 class EventIdSchema(EventSchema):

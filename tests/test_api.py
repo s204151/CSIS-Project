@@ -13,6 +13,7 @@ VALID_PAYLOAD = {
     "event_type": "login_success",
     "user_type": "member",
     "ip_address": "127.0.0.1",
+    "datetime": "2026-04-11T00:00:00"
 }
 
 
@@ -24,7 +25,7 @@ def test_root_health_check():
 
 def test_create_event_success(monkeypatch):
     def fake_db_create_event(event_type, user_type, ip_address):
-        return {"id": 1, "event_type": event_type, "user_type": user_type, "ip_address": ip_address}
+        return {"id": 1, "event_type": event_type, "user_type": user_type, "ip_address": ip_address, "datetime": "2026-04-11T00:00:00"}
 
     monkeypatch.setattr("api.api.db_create_event", fake_db_create_event)
 
@@ -68,7 +69,7 @@ def test_create_event_validation_error():
 
 def test_get_event_success(monkeypatch):
     def fake_get(event_id):
-        return {"id": event_id, "event_type": "login_success", "user_type": "member", "ip_address": "127.0.0.1"}
+        return {"id": event_id, "event_type": "login_success", "user_type": "member", "ip_address": "127.0.0.1", "datetime": "2026-04-11T00:00:00"}
 
     monkeypatch.setattr("api.api.db_get_event", fake_get)
 
@@ -102,8 +103,8 @@ def test_get_event_db_exception(monkeypatch):
 def test_list_events_success(monkeypatch):
     def fake_list(skip, limit):
         return [
-            {"id": 1, "event_type": "login_success", "user_type": "member", "ip_address": "127.0.0.1"},
-            {"id": 2, "event_type": "login_failed", "user_type": "admin", "ip_address": "10.0.0.2"},
+            {"id": 1, "event_type": "login_success", "user_type": "member", "ip_address": "127.0.0.1", "datetime": "2026-04-11T00:00:00"},
+            {"id": 2, "event_type": "login_failed", "user_type": "admin", "ip_address": "10.0.0.2", "datetime": "2026-04-11T00:00:00"},
         ]
 
     monkeypatch.setattr("api.api.db_list_events", fake_list)
