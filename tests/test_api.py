@@ -30,8 +30,21 @@ def test_create_event_success(monkeypatch):
     def fake_enqueue(event_id):
         pass
 
+    # patch db_create_event via import path (works)
     monkeypatch.setattr("api.api.db_create_event", fake_db_create_event)
-    monkeypatch.setattr("src.detection_jobs.enqueue", fake_enqueue)
+
+    # patch the enqueue function on the worker module directly (common import path)
+    monkeypatch.setattr("src.detection_jobs.enqueue", fake_enqueue, raising=False)
+
+    # also try to patch the enqueue function referenced on the api module's detection_jobs attribute if present
+    try:
+        import importlib
+        api_module = importlib.import_module("api.api")
+        if hasattr(api_module, "detection_jobs"):
+            monkeypatch.setattr(api_module.detection_jobs, "enqueue", fake_enqueue, raising=False)
+    except Exception:
+        # ignore any import/patching errors — src.detection_jobs patch is the primary one
+        pass
 
     r = client.post("/events", json=VALID_PAYLOAD)
     assert r.status_code == 201
