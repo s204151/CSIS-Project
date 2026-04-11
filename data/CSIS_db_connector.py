@@ -1,10 +1,9 @@
 import os
-import logging
 from dotenv import load_dotenv
 from typing import Optional, Dict, Any, List
 from sqlalchemy import create_engine, Engine, select
 from sqlalchemy.orm import Session
-from data.Models import Event, Alert, Base
+from data.Models import Event, Alert
 from enums.enums import UserEnum, EventTypeEnum
 
 load_dotenv()
