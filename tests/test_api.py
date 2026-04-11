@@ -27,7 +27,11 @@ def test_create_event_success(monkeypatch):
     def fake_db_create_event(event_type, user_type, ip_address, datetime):
         return {"id": 1, "event_type": event_type, "user_type": user_type, "ip_address": ip_address, "datetime": datetime}
 
+    def fake_enqueue(event_id):
+        pass
+
     monkeypatch.setattr("api.api.db_create_event", fake_db_create_event)
+    monkeypatch.setattr("src.detection_jobs.enqueue", fake_enqueue)
 
     r = client.post("/events", json=VALID_PAYLOAD)
     assert r.status_code == 201
