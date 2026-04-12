@@ -59,4 +59,4 @@ FastAPI, Pydantic, SQLAlchemy, PostgreSQL, Docker, pytest, GitHub Actions
 ## Run
 
 ```bash
-docker-compose up --build
+docker compose --env-file .env up

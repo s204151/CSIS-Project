@@ -64,5 +64,4 @@ def process_event(event_id: int):
 
 
 def enqueue(event_id: int):
-    """Enqueue a detection job for the given event id."""
     process_event.send(event_id)

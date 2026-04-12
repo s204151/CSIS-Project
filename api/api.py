@@ -21,7 +21,6 @@ def root():
 
 @app.post("/events", response_model=EventIdSchema, status_code=201)
 def create_event(event_in: EventSchema):
-    """Create a new event and persist to Postgres."""
     try:
         created = db_create_event(event_type=event_in.event_type,
                                   user_type=event_in.user_type,
@@ -44,7 +43,6 @@ def create_event(event_in: EventSchema):
 
 @app.get("/events/{event_id}", response_model=EventIdSchema)
 def get_event(event_id: int):
-    """Get event by id from Postgres."""
     try:
         row = db_get_event(event_id)
     except Exception as e:
@@ -61,7 +59,6 @@ def get_event(event_id: int):
 
 @app.get("/events", response_model=List[EventIdSchema])
 def list_events(skip: int = 0, limit: int = 100):
-    """List events with optional pagination via skip & limit."""
     if skip < 0 or limit <= 0:
         raise HTTPException(status_code=400, detail="skip must be >= 0 and limit must be > 0")
 
@@ -79,7 +76,6 @@ def list_events(skip: int = 0, limit: int = 100):
 # New: Alerts endpoints
 @app.get("/alerts/{alert_id}", response_model=AlertSchema)
 def get_alert(alert_id: int):
-    """Get alert by id from Postgres."""
     try:
         row = db_get_alert(alert_id)
     except Exception as e:
@@ -96,7 +92,6 @@ def get_alert(alert_id: int):
 
 @app.get("/alerts", response_model=List[AlertSchema])
 def list_alerts(skip: int = 0, limit: int = 100):
-    """List alerts with optional pagination via skip & limit."""
     if skip < 0 or limit <= 0:
         raise HTTPException(status_code=400, detail="skip must be >= 0 and limit must be > 0")
 

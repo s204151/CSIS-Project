@@ -15,18 +15,13 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 
 def get_engine() -> Engine:
-    """Return the SQLAlchemy engine instance.
-
-    Raises RuntimeError if DB environment variables are not set.
-    """
     if not DB_NAME or not DB_USER or not DB_PASSWORD:
         raise RuntimeError("Missing required DB env vars: DB_NAME, DB_USER, DB_PASSWORD")
     return create_engine(f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@postgres/{DB_NAME}", echo=True)
 
 
 def add_event(event_type: EventTypeEnum, user_type: UserEnum, ip_address, datetime: datetime) -> Optional[Dict[str, Any]]:
-    """Insert an event into the `events` table using SQLAlchemy ORM and return the created row as a dict.
-
+    """
     Parameters
     - event_type: Event type (Enum value compatible with Event.event_type)
     - user_type: User type (Enum value compatible with Event.user_type)
@@ -138,7 +133,6 @@ def get_recent_events(last_minutes: int, limit: int = 100, ip_address: Optional[
     - limit must be > 0
     - ip_address: optional filter to only return events from this IP
 
-    Uses SQLAlchemy to query the `events` table based on the Event.datetime column and
     returns a list of dicts in descending datetime order (newest first).
     """
     if last_minutes <= 0 or limit <= 0:
@@ -148,11 +142,10 @@ def get_recent_events(last_minutes: int, limit: int = 100, ip_address: Optional[
     cutoff = datetime.now() - timedelta(minutes=last_minutes)
 
     with Session(get_engine()) as session:
-        # base condition: recent events
+        # recent events
         stmt = select(Event).where(Event.datetime >= cutoff)
 
-        # optional IP filter (use text() with a bound parameter to keep the query simple and avoid
-        # static-analysis type warnings)
+        # optional IP filter
         if ip_address:
             stmt = stmt.where(text("ip_address = :ip")).params(ip=ip_address)
 
