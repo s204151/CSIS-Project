@@ -21,7 +21,7 @@ def get_engine() -> Engine:
     """
     if not DB_NAME or not DB_USER or not DB_PASSWORD:
         raise RuntimeError("Missing required DB env vars: DB_NAME, DB_USER, DB_PASSWORD")
-    return create_engine(f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@localhost/{DB_NAME}", echo=True)
+    return create_engine(f"postgresql+psycopg://{DB_USER}:{DB_PASSWORD}@postgres/{DB_NAME}", echo=True)
 
 
 def add_event(event_type: EventTypeEnum, user_type: UserEnum, ip_address, datetime: datetime) -> Optional[Dict[str, Any]]:
@@ -63,6 +63,7 @@ def get_event(event_id: int) -> Optional[Dict[str, Any]]:
             "event_type": evt.event_type,
             "user_type": evt.user_type,
             "ip_address": evt.ip_address,
+            "datetime": evt.datetime
         }
 
 
@@ -84,6 +85,7 @@ def list_events(skip: int = 0, limit: int = 100) -> List[Dict[str, Any]]:
                 "event_type": evt.event_type,
                 "user_type": evt.user_type,
                 "ip_address": evt.ip_address,
+                "datetime": evt.datetime
             })
         return result
 

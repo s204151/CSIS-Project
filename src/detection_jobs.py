@@ -1,6 +1,11 @@
 import dramatiq
 from data.db_connector import get_recent_events, get_event, create_alert
 from enums.enums import EventTypeEnum, AlertTypeEnum, SeverityEnum
+from dramatiq.brokers.redis import RedisBroker
+
+
+rabbitmq_broker = RedisBroker(url="redis://redis:6379")
+dramatiq.set_broker(rabbitmq_broker)
 
 
 def brute_force_detected(recent_events: list, threshold) -> bool:
@@ -41,7 +46,7 @@ def process_event(event_id: int):
         print(f"Event {event_id} not found")
         return
 
-    recent_events = get_recent_events(last_minutes=1000, limit=10, ip_address=event["ip_address"])
+    recent_events = get_recent_events(last_minutes=10, limit=10, ip_address=event["ip_address"])
 
     if brute_force_detected(recent_events, 5):
         print(f"Brute force detected for IP {event['ip_address']}")
